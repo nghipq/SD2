@@ -1,0 +1,4 @@
+api/server/__pycache__
+.history
+api/venv/
+api/server/data.sqlite
