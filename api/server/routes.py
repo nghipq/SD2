@@ -1,10 +1,12 @@
 from server import app, db
 from server.models import Admins, adminSchema, adminsSchema, Model, modelSchema, modelsSchema, Benh, benhSchema, benhsSchema, ModelBenh, modelSchema, modelsSchema, NhanDien, nhanDienSchema, nhanDiensSchema
-from flask import jsonify, request
+from flask import jsonify, request, session
 from flask_api import status
 import os
+import hashlib
+import jwt
 # from server.until import *
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from server.msg import error, success
 
 @app.route("/ping", methods=["GET"])
@@ -93,5 +95,31 @@ def insertYKien():
     #Step 2 : Trả kết quả nhận diện về client
     return jsonify(
             messages=success["insertSuccess"],
+            success=True
+        ), status.HTTP_200_OK
+#api003
+@app.route("/login", methods=["POST"])
+def login():
+    #Step 1 : Kiểm tra thông tin đăng nhập
+    try:
+        username = request.values["username"]
+        password = hashlib.md5(request.values["password"].encode()).hexdigest()
+        records = Admins.query.filter_by(username=username, password=password).first()
+        if records:
+            token = jwt.encode({
+                'user': username,
+                'exp': datetime.now() + timedelta(seconds=1440)
+            }, app.config['SECRET_KEY'])
+            session['logged_in'] = True
+    #Step 2 : Xử lý kết quả xác thực
+    except:
+        return jsonify(
+            messages=error["handleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    
+    #Step 3 : Kiểm tra thông tin đăng nhập
+    return jsonify(
+            token=token.decode('utf-8'),
             success=True
         ), status.HTTP_200_OK
