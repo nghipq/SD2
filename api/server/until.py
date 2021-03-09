@@ -18,6 +18,7 @@ for File, clr in vectors_file:
     #k-means clusters with 4    
     kmean = KMeans(n_clusters=4, random_state=0).fit(data.values)
     kmeans.append((kmean, clr))
+
 def detect_tom_desease(img, Ten_M):
     surf = cv2.xfeatures2d.SURF_create(5000)
 
@@ -43,8 +44,6 @@ def detect_tom_desease(img, Ten_M):
                 if(dect == i):
                     ans.append(dect)
 
-        print(ans)
         if len(ans) > 0:
             return ans[0]
         return -1
-detect_tom_desease("DomTrang_01","Nhan_Dien_Benh_Tom1")
