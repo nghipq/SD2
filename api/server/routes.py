@@ -1,11 +1,11 @@
 from server import app, db
 from server.models import Admins, adminSchema, adminsSchema, Model, modelSchema, modelsSchema, Benh, benhSchema, benhsSchema, ModelBenh, modelSchema, modelsSchema, NhanDien, nhanDienSchema, nhanDiensSchema
-from flask import jsonify, request, session
+from flask import jsonify, request, session, send_file
 from flask_api import status
 import os
 import hashlib
 import jwt
-# from server.until import *
+from server.until import get_queries
 from datetime import date, datetime, timedelta
 from server.msg import error, success
 from functools import wraps
@@ -193,3 +193,16 @@ def updateBenh():
             Records=1,
             success=True
         ), status.HTTP_200_OK
+#api013
+@app.route("/loadImage", methods=["GET"])
+def loadImage():
+    try:
+        #Step 1 : Lấy file ảnh
+        ImageName = get_queries(request)["ImageName"]
+        #Step 2 : Trả về kết quả xử lý
+        return send_file(f"./img/{ImageName}", mimetype='image/gif')
+    except:
+        return jsonify(
+            messages=error["handleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
