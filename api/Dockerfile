@@ -8,7 +8,7 @@ WORKDIR /server
 ADD . /server
 
 #Install the dependencies
-RUN pip install -r requirement.txt
+RUN pip install -r requirements.txt
 
 #run the command to start uWSGI
 CMD ["uwsgi", "app.ini"]
