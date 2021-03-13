@@ -8,6 +8,9 @@ import zipfile
 import pandas as pd
 import sklearn
 from sklearn.cluster import KMeans
+from datetime import date, datetime, timedelta
+from server import app, db
+from server.models import Admins, adminSchema, adminsSchema, Model, modelSchema, modelsSchema, Benh, benhSchema, benhsSchema, ModelBenh, modelSchema, modelsSchema, NhanDien, nhanDienSchema, nhanDiensSchema
 
 vectors_file = [("training_set_dom_den.csv", 0), ("training_set_dom_trang.csv", 1), ("training_set_den_mang.csv", 0), 
 ("training_set_hoai_tu_co.csv", 1), ("training_set_hoai_tu_gan.csv", 0), ("training_set_tom_bt.csv", 2)]
@@ -47,3 +50,19 @@ def detect_tom_desease(img, Ten_M):
         if len(ans) > 0:
             return ans[0]
         return -1
+
+#Get query from DB
+def get_queries(request):
+    return dict(parse.parse_qsl(parse.urlsplit(request.url).query))
+
+#Insert model bệnh
+def insertMB(Id_M, Id_B, STT,TrangThai):
+    insertModelBenh = ModelBenh(Id_M=Id_M, Id_B=Id_B, STT=STT, Created=datetime.now(
+    ), Updated=datetime.now(), Created_function_id="api008", Updated_function_id="api008", Revision=0, TrangThai=TrangThai)
+    db.session.add(insertModelBenh)
+    db.session.commit()
+
+#Delete model bệnh
+def deleteMB(Id_M):
+    Id_M = ModelBenh.query.filter_by(Id_M=Id_M).delete()
+    db.session.commit()
