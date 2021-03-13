@@ -5,8 +5,6 @@ services:
     build: ./api
     container_name: sd2
     restart: always
-    environment:
-      - APP_NAME = MyFlaskApp
     expose:
       - 8080
 
