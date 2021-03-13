@@ -11,9 +11,7 @@ from server.msg import error, success
 from functools import wraps
 import json
 
-# check token
-
-
+# check user token
 def check_for_token(func):
     @wraps(func)
     def wrapped(*args, **kwargs):
@@ -28,16 +26,12 @@ def check_for_token(func):
     return wrapped
 
 # Đăng xuất
-
-
 @app.route("/logout", methods=["GET"])
 def Logout():
     session['logged_in'] = False
     return "logout"
 
 # api001
-
-
 @app.route("/detect", methods=["POST"])
 def detect():
     # Step 1 : Select model nhận diện
@@ -103,8 +97,6 @@ def detect():
     ), status.HTTP_200_OK
 
 # api002
-
-
 @app.route("/insertYKien", methods=["POST"])
 def insertYKien():
     # Step 1 : Cập nhật ý kiến kết quả nhận diện
@@ -128,8 +120,6 @@ def insertYKien():
     ), status.HTTP_200_OK
 
 # api003
-
-
 @app.route("/login", methods=["POST"])
 def login():
     # Step 1 : Kiểm tra thông tin đăng nhập
@@ -162,8 +152,6 @@ def login():
     ), status.HTTP_200_OK
 
 # api004
-
-
 @app.route("/insertBenh", methods=["POST"])
 # Step 1 : Check user token
 @check_for_token
@@ -186,8 +174,6 @@ def insertBenh():
     ), status.HTTP_200_OK
 
 # api005
-
-
 @app.route("/updateBenh", methods=["PATCH"])
 # Step 1 : Check user token
 @check_for_token
@@ -218,8 +204,6 @@ def updateBenh():
     ), status.HTTP_200_OK
 
 # api006
-
-
 @app.route("/deleteBenh", methods=["DELETE"])
 # Step 1 : Check user token
 @check_for_token
@@ -240,8 +224,6 @@ def deleteBenh():
     ), status.HTTP_200_OK
 
 # api007
-
-
 @app.route("/insertModel", methods=["POST"])
 # Step 1 : Check user token
 @check_for_token
@@ -296,8 +278,6 @@ def insertModel():
     ), status.HTTP_200_OK
 
 # api008
-
-
 @app.route("/insertModelBenh", methods=["POST"])
 # Step 1 : Check user token
 @check_for_token
@@ -318,8 +298,6 @@ def insertModelBenh():
     ), status.HTTP_200_OK
 
 # api009
-
-
 @app.route("/updateModel", methods=["PATCH"])
 # Step 1 : Check user token
 @check_for_token
@@ -375,8 +353,6 @@ def updateModel():
     ), status.HTTP_200_OK
 
 # api011
-
-
 @app.route("/deleteModel", methods=["DELETE"])
 # Step 1 : Check user token
 @check_for_token
@@ -399,8 +375,6 @@ def deleteModel():
     ), status.HTTP_200_OK
 
 # api012   
-
-
 @app.route("/deleteModelBenh", methods=["DELETE"])
 # Step 1 : Check user token
 @check_for_token
@@ -420,8 +394,6 @@ def deleteModelBenh():
     ), status.HTTP_200_OK
 
 # api013
-
-
 @app.route("/loadImage", methods=["GET"])
 def loadImage():
     try:

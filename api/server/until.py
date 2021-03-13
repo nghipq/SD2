@@ -52,16 +52,18 @@ from server.models import Admins, adminSchema, adminsSchema, Model, modelSchema,
 #         return -1
 # detect_tom_desease("DomTrang_01","Nhan_Dien_Benh_Tom1")
 
-
+#Get query from DB
 def get_queries(request):
     return dict(parse.parse_qsl(parse.urlsplit(request.url).query))
 
-
+#Insert model bệnh
 def insertMB(Id_M, Id_B, STT,TrangThai):
     insertModelBenh = ModelBenh(Id_M=Id_M, Id_B=Id_B, STT=STT, Created=datetime.now(
     ), Updated=datetime.now(), Created_function_id="api008", Updated_function_id="api008", Revision=0, TrangThai=TrangThai)
     db.session.add(insertModelBenh)
     db.session.commit()
+
+#Delete model bệnh
 def deleteMB(Id_M):
     Id_M = ModelBenh.query.filter_by(Id_M=Id_M).delete()
     db.session.commit()
