@@ -5,12 +5,15 @@ from flask_api import status
 import os
 import hashlib
 import jwt
-from server.until import get_queries
+from server.until import get_queries, insertMB, deleteMB
 from datetime import date, datetime, timedelta
 from server.msg import error, success
 from functools import wraps
+import json
 
 # check token
+
+
 def check_for_token(func):
     @wraps(func)
     def wrapped(*args, **kwargs):
@@ -24,13 +27,17 @@ def check_for_token(func):
         return func(*args, **kwargs)
     return wrapped
 
-#Đăng xuất
+# Đăng xuất
+
+
 @app.route("/logout", methods=["GET"])
 def Logout():
     session['logged_in'] = False
     return "logout"
 
-#api001
+# api001
+
+
 @app.route("/detect", methods=["POST"])
 def detect():
     # Step 1 : Select model nhận diện
@@ -51,7 +58,7 @@ def detect():
             messages=error["handleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-    #Step 3 : Phân loại bệnh
+    # Step 3 : Phân loại bệnh
     # try:
     #     DiaChiAnh = datetime.now().strftime("%d%m%Y_%H%M%S") + ".jpg"
     #     f = request.files['image']
@@ -61,46 +68,51 @@ def detect():
     #         messages=error["handleFailure"],
     #         success=False
     #     ), status.HTTP_400_BAD_REQUEST
-    #Step 4 : Lấy thông tin bệnh
+    # Step 4 : Lấy thông tin bệnh
     try:
-        Id_B=ModelBenh.query.filter_by(Id_M=Id_M,STT=1).first().Id_B
-        B=Benh.query.filter_by(Id_B=Id_B).first()
+        Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=1).first().Id_B
+        B = Benh.query.filter_by(Id_B=Id_B).first()
     except:
         return jsonify(
             messages=error["handleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-    #Step 5 : Tạo thông tin nhận diện mới
+    # Step 5 : Tạo thông tin nhận diện mới
     try:
-        insertNhanDien = NhanDien(DiaChiAnh=DiaChiAnh, Email=request.values["Email"], Id_B=Id_B,YKien="",Created=datetime.now(),Updated=datetime.now(), Created_function_id= "API001", Updated_function_id="API001", Revision=0,TrangThai=True)
+        insertNhanDien = NhanDien(DiaChiAnh=DiaChiAnh, Email=request.values["Email"], Id_B=Id_B, YKien="", Created=datetime.now(
+        ), Updated=datetime.now(), Created_function_id="API001", Updated_function_id="API001", Revision=0, TrangThai=True)
         db.session.add(insertNhanDien)
         db.session.commit()
-        Id_ND = db.session.query(NhanDien).order_by(NhanDien.Id_ND.desc()).first().Id_ND
+        Id_ND = db.session.query(NhanDien).order_by(
+            NhanDien.Id_ND.desc()).first().Id_ND
     except:
         return jsonify(
             messages=error["handleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-   #Step 6 : Trả kết quả nhận diện về client
+   # Step 6 : Trả kết quả nhận diện về client
     return jsonify(
-            Id_ND=Id_ND,
-            Id_B=Id_B,
-            ImgName=DiaChiAnh,
-            Ten_B=B.Ten_B,
-            ThongTin_B=B.ThongTin_B,
-            CachChuaTri=B.CachChuaTri,
-            GhiChu=B.GhiChu,
-            success=True
-        ), status.HTTP_200_OK
-#api002
+        Id_ND=Id_ND,
+        Id_B=Id_B,
+        ImgName=DiaChiAnh,
+        Ten_B=B.Ten_B,
+        ThongTin_B=B.ThongTin_B,
+        CachChuaTri=B.CachChuaTri,
+        GhiChu=B.GhiChu,
+        success=True
+    ), status.HTTP_200_OK
+
+# api002
+
+
 @app.route("/insertYKien", methods=["POST"])
 def insertYKien():
-    #Step 1 : Cập nhật ý kiến kết quả nhận diện
+    # Step 1 : Cập nhật ý kiến kết quả nhận diện
     try:
         Id_ND = request.values["Id_ND"]
         Nhandien = NhanDien.query.filter_by(Id_ND=Id_ND).first()
         Nhandien.YKien = request.values["YKien"]
-        Nhandien.Update=datetime.now()
+        Nhandien.Update = datetime.now()
         Nhandien.Updated_function_id = "api002"
         Nhandien.Id_ND = Id_ND
         db.session.commit()
@@ -109,25 +121,29 @@ def insertYKien():
             messages=error["handleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-    #Step 2 : Trả kết quả nhận diện về client
+    # Step 2 : Trả kết quả nhận diện về client
     return jsonify(
-            messages=success["insertSuccess"],
-            success=True
-        ), status.HTTP_200_OK
-#api003
+        messages=success["insertSuccess"],
+        success=True
+    ), status.HTTP_200_OK
+
+# api003
+
+
 @app.route("/login", methods=["POST"])
 def login():
-    #Step 1 : Kiểm tra thông tin đăng nhập
+    # Step 1 : Kiểm tra thông tin đăng nhập
     try:
         username = request.values["username"]
         password = hashlib.md5(request.values["password"].encode()).hexdigest()
-        records = Admins.query.filter_by(username=username, password=password).first()
+        records = Admins.query.filter_by(
+            username=username, password=password).first()
     except:
         return jsonify(
             messages=error["handleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-    #Step 2 : Xử lý kết quả xác thực
+    # Step 2 : Xử lý kết quả xác thực
     if records:
         token = jwt.encode({
             'user': username,
@@ -139,19 +155,23 @@ def login():
             messages=error["AuthenticationFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-    #Step 3 : Kiểm tra thông tin đăng nhập
+    # Step 3 : Kiểm tra thông tin đăng nhập
     return jsonify(
-            token=token.decode('utf-8'),
-            success=True
-        ), status.HTTP_200_OK
-#api004
+        token=token.decode('utf-8'),
+        success=True
+    ), status.HTTP_200_OK
+
+# api004
+
+
 @app.route("/insertBenh", methods=["POST"])
-#Step 1 : Check user token
+# Step 1 : Check user token
 @check_for_token
 def insertBenh():
-    #Step 2 : Tạo bệnh mới
+    # Step 2 : Tạo bệnh mới
     try:
-        insertBenh = Benh(Ten_B=request.values["Ten_B"],ThongTin_B=request.values["ThongTin_B"],CachChuaTri=request.values["CachChuaTri"],GhiChu=request.values["GhiChu"],Created=datetime.now(),Updated=datetime.now(),Created_function_id="api004",Updated_function_id="api004",Revision=0,TrangThai=True)
+        insertBenh = Benh(Ten_B=request.values["Ten_B"], ThongTin_B=request.values["ThongTin_B"], CachChuaTri=request.values["CachChuaTri"], GhiChu=request.values["GhiChu"], Created=datetime.now(
+        ), Updated=datetime.now(), Created_function_id="api004", Updated_function_id="api004", Revision=0, TrangThai=True)
         db.session.add(insertBenh)
         db.session.commit()
     except:
@@ -159,47 +179,255 @@ def insertBenh():
             messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-    #Step 3 : Trả về kết quả xử lý
+    # Step 3 : Trả về kết quả xử lý
     return jsonify(
-            Records=1,
-            success=True
-        ), status.HTTP_200_OK
-#api005
+        Records=1,
+        success=True
+    ), status.HTTP_200_OK
+
+# api005
+
+
 @app.route("/updateBenh", methods=["PATCH"])
-#Step 1 : Check user token
+# Step 1 : Check user token
 @check_for_token
 def updateBenh():
-    #Step 2 : Tạo bệnh mới
+    # Step 2 : Tạo bệnh mới
     try:
         Id_B = request.values["Id_B"]
         benh = Benh.query.filter_by(Id_B=Id_B).first()
-        benh.Ten_B=request.values["Ten_B"]
-        benh.ThongTin_B=request.values["ThongTin_B"]
-        benh.CachChuaTri=request.values["CachChuaTri"]
-        benh.GhiChu=request.values["GhiChu"]
-        benh.Updated=datetime.now()
-        benh.Updated_function_id="api005"
-        benh.Revision+=1
-        benh.TrangThai=True
-        benh.Id_B=Id_B
+        benh.Ten_B = request.values["Ten_B"]
+        benh.ThongTin_B = request.values["ThongTin_B"]
+        benh.CachChuaTri = request.values["CachChuaTri"]
+        benh.GhiChu = request.values["GhiChu"]
+        benh.Updated = datetime.now()
+        benh.Updated_function_id = "api005"
+        benh.Revision += 1
+        benh.TrangThai = True
+        benh.Id_B = Id_B
         db.session.commit()
     except:
         return jsonify(
             messages=error["handleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-    #Step 3 : Trả về kết quả xử lý
+    # Step 3 : Trả về kết quả xử lý
     return jsonify(
-            Records=1,
-            success=True
-        ), status.HTTP_200_OK
-#api013
+        Records=1,
+        success=True
+    ), status.HTTP_200_OK
+
+# api006
+
+
+@app.route("/deleteBenh", methods=["DELETE"])
+# Step 1 : Check user token
+@check_for_token
+def deleteBenh():
+    # Step 2 : Xóa bệnh
+    try:
+        Id_B = Benh.query.filter_by(Id_B=request.values["Id_B"]).delete()
+        db.session.commit()
+    except:
+        return jsonify(
+            messages=error["handleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # Step 3 : Trả về kết quả xử lý
+    return jsonify(
+        Records=1,
+        success=True
+    ), status.HTTP_200_OK
+
+# api007
+
+
+@app.route("/insertModel", methods=["POST"])
+# Step 1 : Check user token
+@check_for_token
+def insertModel():
+    try:
+        Ten_M = request.values["Ten_M"]
+        Records = Model.query.filter_by(Ten_M=Ten_M)
+        # Step 2 : Check tên model đã tồn tại hay chưa
+        if Records.count() > 0:
+            return jsonify(
+                success=False,
+                message="Model name is already exist !"
+            )
+        # Step 3 : Lưu file model
+        Models = request.files["Model"]
+        Models.save(f"./server/models/{request.values['Ten_M']}.pickle")
+        # Step 4 : Tạo model mới
+        insertModel = Model(Ten_M=Ten_M, Created=datetime.now(), Updated=datetime.now(
+        ), Created_function_id="api007", Updated_function_id="api007", Revision=0, TrangThai=True)
+        try:
+            db.session.add(insertModel)
+            db.session.commit()
+        except:
+            return jsonify(
+                    messages=error["handleFailure"],
+                    success=False
+                ), status.HTTP_400_BAD_REQUEST
+
+        Id_M = db.session.query(Model).order_by(Model.Id_M.desc()).first().Id_M
+        # Step 5 : Tạo model bệnh mới
+        BenhList = request.values["BenhList"]
+        BenhLists = json.loads(BenhList)
+        print(BenhLists)
+        for benh in BenhLists:
+            try:
+                insertMB(Id_M, benh["Id_B"], benh["STT"],True)
+            except:
+                return jsonify(
+                    messages=error["handleFailure"],
+                    success=False
+                ), status.HTTP_400_BAD_REQUEST
+
+    except:
+        return jsonify(
+            messages=error["handleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # Step 6 : Trả về kết quả xử lý
+    return jsonify(
+        Records=1,
+        success=True
+    ), status.HTTP_200_OK
+
+# api008
+
+
+@app.route("/insertModelBenh", methods=["POST"])
+# Step 1 : Check user token
+@check_for_token
+def insertModelBenh():
+    # Step 2 : Tạo model bệnh mới
+    try:
+        insertMB(request.values["Id_M"],
+                 request.values["Id_B"], request.values["STT"],True)
+    except:
+        return jsonify(
+            messages=error["handleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # Step 3 : Trả về kết quả xử lý
+    return jsonify(
+        Records=1,
+        success=True
+    ), status.HTTP_200_OK
+
+# api009
+
+
+@app.route("/updateModel", methods=["PATCH"])
+# Step 1 : Check user token
+@check_for_token
+def updateModel():
+    try:
+        Ten_M = request.values["Ten_M"]
+        Id_M = request.values["Id_M"]
+        Records = Model.query.filter_by(Ten_M=Ten_M)
+        GetId = Model.query.filter_by(Id_M=Id_M)
+        Models = request.files["Model"]
+        # Step 2 : Check tên model đã tồn tại hay chưa
+        if Records.count() > 0 & GetId.Ten_M != Ten_M:
+            Models.remove(f"./server/models/{request.values['Ten_M']}.pickle")
+            return jsonify(
+                success=False,
+                message="Model name is already exist !"
+            )
+        # Step 3 : Lưu file model
+        Models.save(f"./server/models/{request.values['Ten_M']}.pickle")
+        # Step 4 : Xóa model bệnh
+        deleteMB(Id_M)
+        # Step 5 : Cập nhật model
+        Models = Model.query.filter_by(Id_M=Id_M).first()
+        Models.Ten_M = Ten_M
+        Models.Updated = datetime.now()
+        Models.Updated_function_id = "api009"
+        Models.Revision += 1
+        Models.TrangThai = True
+        Models.Id_M = Id_M
+        db.session.commit()
+        # Step 6 : Tạo model bệnh mới
+        BenhList = request.values["BenhList"]
+        BenhLists = ast.literal_eval(BenhList)["BenhList"]
+        print(BenhList)
+        for benh in BenhLists:
+            try:
+                insertMB(Id_M, benh.Id_B, benh.STT,benh.TrangThai)
+            except:
+                return jsonify(
+                    messages=error["handleFailure"],
+                    success=False
+                ), status.HTTP_400_BAD_REQUEST
+
+    except:
+        return jsonify(
+            messages=error["handleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # Step 7 : Trả về kết quả xử lý
+    return jsonify(
+        Records=1,
+        success=True
+    ), status.HTTP_200_OK
+
+# api011
+
+
+@app.route("/deleteModel", methods=["DELETE"])
+# Step 1 : Check user token
+@check_for_token
+def deleteModel():
+    try:
+        # Step 2 : Xóa model bệnh
+        deleteMB(request.values["Id_M"])
+        # Step 3 : Xóa model
+        Id_M=Model.query.filter_by(Id_M=request.values["Id_M"]).delete()
+        db.session.commit()
+    except:
+        return jsonify(
+            messages=error["handleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # Step 3 : Trả về kết quả xử lý
+    return jsonify(
+        Records=1,
+        success=True
+    ), status.HTTP_200_OK
+
+# api012   
+
+
+@app.route("/deleteModelBenh", methods=["DELETE"])
+# Step 1 : Check user token
+@check_for_token
+def deleteModelBenh():
+    try:
+        # Step 2 : Xóa model bệnh
+        deleteMB(request.values["Id_M"])
+    except:
+        return jsonify(
+            messages=error["handleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # Step 3 : Trả về kết quả xử lý
+    return jsonify(
+        Records=1,
+        success=True
+    ), status.HTTP_200_OK
+
+# api013
+
+
 @app.route("/loadImage", methods=["GET"])
 def loadImage():
     try:
-        #Step 1 : Lấy file ảnh
+        # Step 1 : Lấy file ảnh
         ImageName = get_queries(request)["ImageName"]
-        #Step 2 : Trả về kết quả xử lý
+        # Step 2 : Trả về kết quả xử lý
         return send_file(f"./img/{ImageName}", mimetype='image/gif')
     except:
         return jsonify(
