@@ -17,7 +17,7 @@ vectors_file = [("training_set_dom_den.csv", 0), ("training_set_dom_trang.csv", 
 kmeans = []
 
 for File, clr in vectors_file:
-    data = pd.read_csv(f"./vector_surf_tom/{File}")
+    data = pd.read_csv(f"./server/vector_surf_tom/{File}")
     #k-means clusters with 4    
     kmean = KMeans(n_clusters=4, random_state=0).fit(data.values)
     kmeans.append((kmean, clr))
@@ -25,10 +25,10 @@ for File, clr in vectors_file:
 def detect_tom_desease(img, Ten_M):
     surf = cv2.xfeatures2d.SURF_create(5000)
 
-    with open(f"./models/{Ten_M}.pickle", "rb") as file:
+    with open(f"./server/models/{Ten_M}.pickle", "rb") as file:
         clf = pickle.load(file)
 
-        image = cv2.imread(os.path.join("./img", img))
+        image = cv2.imread(os.path.join("./server/img", img))
         image = cv2.resize(image, (256, 128))
 
         _, des = surf.detectAndCompute(image,None)
