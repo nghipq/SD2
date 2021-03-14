@@ -16,8 +16,6 @@ vectors_file = [("training_set_dom_den.csv", 0), ("training_set_dom_trang.csv", 
 ("training_set_hoai_tu_co.csv", 1), ("training_set_hoai_tu_gan.csv", 0), ("training_set_tom_bt.csv", 2)]
 kmeans = []
 
-print(cv2.__version__)
-
 for File, clr in vectors_file:
     data = pd.read_csv(f"./server/vector_surf_tom/{File}")
     #k-means clusters with 4    
