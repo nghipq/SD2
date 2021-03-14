@@ -36,62 +36,62 @@ def Logout():
 @app.route("/detect", methods=["POST"])
 def detect():
     # Step 1 : Select model nhận diện
-    # try:
+    try:
         M = Model.query.filter_by(TrangThai=True).first()
         Id_M = M.Id_M
         Ten_M = M.Ten_M
-    # except:
-    #     return jsonify(
-    #         messages=error["HandleFailure"],
-    #         success=False
-    #     ), status.HTTP_400_BAD_REQUEST
+    except:
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
     # # Step 2 : Lưu file ảnh vào hệ thống
-    # try:
+    try:
         DiaChiAnh = datetime.now().strftime("%d%m%Y_%H%M%S") + ".jpg"
         f = request.files['image']
         f.save("./server/img/"+DiaChiAnh)
-    # except:
-    #     return jsonify(
-    #         messages=error["HandleFailure"],
-    #         success=False
-    #     ), status.HTTP_400_BAD_REQUEST
+    except:
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
     # # Step 3 : Phân loại bệnh
-    # try:
+    try:
         STT = int(detect_tom_desease(DiaChiAnh, Ten_M)) + 1
         if STT == 0:
             return jsonify(
                 messages=error["cannotDetection"],
                 success=False
             ), status.HTTP_400_BAD_REQUEST
-    # except:
-    #     return jsonify(
-    #         messages=error["HandleFailure"],
-    #         success=False
-    #     ), status.HTTP_400_BAD_REQUEST
+    except:
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
     # # Step 4 : Lấy thông tin bệnh
-    # try:
+    try:
         Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=STT).first().Id_B
         B = Benh.query.filter_by(Id_B=Id_B).first()
-    # except:
-    #     return jsonify(
-    #         messages=error["HandleFailure"],
-    #         success=False
-    #     ), status.HTTP_400_BAD_REQUEST
-    # # Step 5 : Tạo thông tin nhận diện mới
-    # try:
+    except:
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # Step 5 : Tạo thông tin nhận diện mới
+    try:
         insertNhanDien = NhanDien(DiaChiAnh=DiaChiAnh, Email=request.values["Email"], Id_B=Id_B, YKien="", Created=datetime.now(), 
         Updated=datetime.now(), Created_function_id="API001", Updated_function_id="API001", Revision=0, TrangThai=True)
         db.session.add(insertNhanDien)
         db.session.commit()
         Id_ND = db.session.query(NhanDien).order_by(
             NhanDien.Id_ND.desc()).first().Id_ND
-    # except:
-    #     return jsonify(
-    #         messages=error["HandleFailure"],
-    #         success=False
-    #     ), status.HTTP_400_BAD_REQUEST
-   # Step 6 : Trả kết quả nhận diện về client
+    except:
         return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+   # Step 6 : Trả kết quả nhận diện về client
+    return jsonify(
             Id_ND=Id_ND,
             Id_B=Id_B,
             ImgName=DiaChiAnh,
@@ -234,7 +234,7 @@ def deleteBenh():
 # Step 1 : Check user token
 @check_for_token
 def insertModel():
-    # try:
+    try:
         Ten_M = request.values["Ten_M"]
         Records = Model.query.filter_by(Ten_M=Ten_M)
         # Step 2 : Check tên model đã tồn tại hay chưa
@@ -250,13 +250,13 @@ def insertModel():
         oldModel = Model.query.filter_by(TrangThai=True).first()
         oldModel.TrangThai = False
 
-        # try:
-        session.commit()
-        # except:
-        #     return jsonify(
-        #             messages=error["HandleFailure"],
-        #             success=False
-        #         ), status.HTTP_400_BAD_REQUEST
+        try:
+            db.session.commit()
+        except:
+            return jsonify(
+                    messages=error["HandleFailure"],
+                    success=False
+                ), status.HTTP_400_BAD_REQUEST
 
         insertModel = Model(Ten_M=Ten_M, Created=datetime.now(), Updated=datetime.now(
         ), Created_function_id="api007", Updated_function_id="api007", Revision=0, TrangThai=True)
@@ -283,13 +283,13 @@ def insertModel():
                     success=False
                 ), status.HTTP_400_BAD_REQUEST
 
-    # except:
-    #     return jsonify(
-    #         messages=error["HandleFailure"],
-    #         success=False
-    #     ), status.HTTP_400_BAD_REQUEST
-    # Step 6 : Trả về kết quả xử lý
+    except:
         return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # Step 6 : Trả về kết quả xử lý
+    return jsonify(
             Records=1,
             success=True
         ), status.HTTP_200_OK
