@@ -40,7 +40,7 @@ def detect():
         Id_M = Model.query.filter_by(TrangThai=True).first().Id_M
     except:
         return jsonify(
-            messages=error["HandleFailure"],
+            messages="Get Id_M",
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 2 : Lưu file ảnh vào hệ thống
@@ -50,7 +50,7 @@ def detect():
         f.save("./server/img/"+DiaChiAnh)
     except:
         return jsonify(
-            messages=error["HandleFailure"],
+            messages="save img",
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 3 : Phân loại bệnh
@@ -63,7 +63,7 @@ def detect():
             ), status.HTTP_400_BAD_REQUEST
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages="detect fail",
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 4 : Lấy thông tin bệnh
@@ -72,7 +72,7 @@ def detect():
         B = Benh.query.filter_by(Id_B=Id_B).first()
     except:
         return jsonify(
-            messages=error["HandleFailure"],
+            messages="get benh",
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 5 : Tạo thông tin nhận diện mới
@@ -85,7 +85,7 @@ def detect():
             NhanDien.Id_ND.desc()).first().Id_ND
     except:
         return jsonify(
-            messages=error["HandleFailure"],
+            messages="insert nhan dien",
             success=False
         ), status.HTTP_400_BAD_REQUEST
    # Step 6 : Trả kết quả nhận diện về client
