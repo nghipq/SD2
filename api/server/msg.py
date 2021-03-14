@@ -1,5 +1,5 @@
 error = {
-    "handleFailure": "Request Failure. Try again please!",
+    "HandleFailure": "Request Failure. Try again please!",
     "AuthenticationFailure": "Authentication Failure. Try again please!"
 }
 success = {

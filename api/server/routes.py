@@ -1,15 +1,16 @@
 from server import app, db
 from server.models import Admins, adminSchema, adminsSchema, Model, modelSchema, modelsSchema, Benh, benhSchema, benhsSchema, ModelBenh, modelSchema, modelsSchema, NhanDien, nhanDienSchema, nhanDiensSchema
-from flask import jsonify, request, session, send_file
+from flask import jsonify, request, session, send_file, send_from_directory
 from flask_api import status
 import os
 import hashlib
 import jwt
-from server.until import get_queries, insertMB, deleteMB
+from server.until import get_queries, insertMB, deleteMB, format_benhs_list, filter_arr_by_queries, format_nhandiens_list, format_models_list
 from datetime import date, datetime, timedelta
 from server.msg import error, success
 from functools import wraps
 import json
+import shutil
 
 # check user token
 def check_for_token(func):
@@ -39,7 +40,7 @@ def detect():
         Id_M = Model.query.filter_by(TrangThai=True).first().Id_M
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 2 : Lưu file ảnh vào hệ thống
@@ -49,7 +50,7 @@ def detect():
         f.save("./server/img/"+DiaChiAnh)
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 3 : Phân loại bệnh
@@ -59,7 +60,7 @@ def detect():
     #     f.save("./server/img/"+DiaChiAnh)
     # except:
     #     return jsonify(
-    #         messages=error["handleFailure"],
+    #         messages=error["HandleFailure"],
     #         success=False
     #     ), status.HTTP_400_BAD_REQUEST
     # Step 4 : Lấy thông tin bệnh
@@ -68,7 +69,7 @@ def detect():
         B = Benh.query.filter_by(Id_B=Id_B).first()
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 5 : Tạo thông tin nhận diện mới
@@ -81,7 +82,7 @@ def detect():
             NhanDien.Id_ND.desc()).first().Id_ND
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
    # Step 6 : Trả kết quả nhận diện về client
@@ -110,7 +111,7 @@ def insertYKien():
         db.session.commit()
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 2 : Trả kết quả nhận diện về client
@@ -130,7 +131,7 @@ def login():
             username=username, password=password).first()
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 2 : Xử lý kết quả xác thực
@@ -194,7 +195,7 @@ def updateBenh():
         db.session.commit()
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 3 : Trả về kết quả xử lý
@@ -214,7 +215,7 @@ def deleteBenh():
         db.session.commit()
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 3 : Trả về kết quả xử lý
@@ -248,7 +249,7 @@ def insertModel():
             db.session.commit()
         except:
             return jsonify(
-                    messages=error["handleFailure"],
+                    messages=error["HandleFailure"],
                     success=False
                 ), status.HTTP_400_BAD_REQUEST
 
@@ -262,13 +263,13 @@ def insertModel():
                 insertMB(Id_M, benh["Id_B"], benh["STT"],True)
             except:
                 return jsonify(
-                    messages=error["handleFailure"],
+                    messages=error["HandleFailure"],
                     success=False
                 ), status.HTTP_400_BAD_REQUEST
 
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 6 : Trả về kết quả xử lý
@@ -288,7 +289,7 @@ def insertModelBenh():
                  request.values["Id_B"], request.values["STT"],True)
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 3 : Trả về kết quả xử lý
@@ -337,13 +338,13 @@ def updateModel():
                 insertMB(Id_M, benh.Id_B, benh.STT,benh.TrangThai)
             except:
                 return jsonify(
-                    messages=error["handleFailure"],
+                    messages=error["HandleFailure"],
                     success=False
                 ), status.HTTP_400_BAD_REQUEST
 
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 7 : Trả về kết quả xử lý
@@ -365,7 +366,7 @@ def deleteModel():
         db.session.commit()
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 3 : Trả về kết quả xử lý
@@ -384,7 +385,7 @@ def deleteModelBenh():
         deleteMB(request.values["Id_M"])
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 3 : Trả về kết quả xử lý
@@ -403,6 +404,125 @@ def loadImage():
         return send_file(f"./img/{ImageName}", mimetype='image/gif')
     except:
         return jsonify(
-            messages=error["handleFailure"],
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
+
+# api014
+@app.route("/exportImage", methods=["GET"])
+def exportImage():
+    try:
+        # Step 1 : Lấy file “.Zip” ảnh
+        shutil.make_archive("./server/data_anh_benh", 'zip', "./server/img")
+        return send_from_directory(directory=".", filename="data_anh_benh.zip", as_attachment=True)
+    except:
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+        # Step 2 : Trả về kết quả xử lý
+    return jsonify(
+        Records=1,
+        success=True
+    ), status.HTTP_200_OK
+
+# api015
+@app.route("/benhList", methods=["GET"])
+# Step 1 : Check user token
+@check_for_token
+def benhList():
+    try:
+        # Step 2 : Lấy danh sách bệnh
+        queries = get_queries(request)
+        try:
+            Updated_datefrom = queries["Updated_datefrom"]
+            Updated_dateto = queries["Updated_dateto"]
+            BenhList = Benh.query.filter(Benh.Updated >= Updated_datefrom, Benh.Updated <= (Updated_dateto + " 23:59:59"))
+        except:
+            try:
+                Updated_datefrom = queries["Updated_datefrom"]
+                BenhList = Benh.query.filter(Benh.Updated >= Updated_datefrom)
+            except:
+                try:
+                    Updated_dateto = queries["Updated_dateto"]
+                    BenhList = Benh.query.filter(Benh.Updated <= (Updated_dateto + " 23:59:59"))
+                except:    
+                    BenhList = Benh.query.all()
+        all_benhs = format_benhs_list(filter_arr_by_queries(benhsSchema.dump(BenhList), queries))
+    except:
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+        # Step 3 : Trả về kết quả xử lý
+    return jsonify(
+        Records=all_benhs,
+        success=True
+    ), status.HTTP_200_OK
+
+# api016
+@app.route("/ModelList", methods=["GET"])
+# Step 1 : Check user token
+# @check_for_token
+def ModelList():
+    try:
+        # Step 2 : Lấy danh sách model
+        queries = get_queries(request)
+        try:
+            Updated_datefrom = queries["Updated_datefrom"]
+            Updated_dateto = queries["Updated_dateto"]
+            ModelList = Model.query.filter(Model.Updated >= Updated_datefrom, Model.Updated <= (Updated_dateto + " 23:59:59"))
+        except:
+            try:
+                Updated_datefrom = queries["Updated_datefrom"]
+                ModelList = Model.query.filter(Model.Updated >= Updated_datefrom)
+            except:
+                try:
+                    Updated_dateto = queries["Updated_dateto"]
+                    ModelList = Model.query.filter(Model.Updated <= (Updated_dateto + " 23:59:59"))
+                except:    
+                    ModelList = Model.query.all()
+        all_models = format_models_list(filter_arr_by_queries(modelsSchema.dump(ModelList), queries))
+        # Step 3 : Xử lý ModelBenhList của từng Model
+    except:
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+        # Step 3 : Trả về kết quả xử lý
+    return jsonify(
+        Records=all_models,
+        success=True
+    ), status.HTTP_200_OK
+
+# api017
+@app.route("/NhanDienList", methods=["GET"])
+def NhanDienList():
+    try:
+        # Step 1 : Tạo thông tin nhận diện mới
+        queries = get_queries(request)
+        try:
+            Updated_datefrom = queries["Updated_datefrom"]
+            Updated_dateto = queries["Updated_dateto"]
+            NhanDienList = NhanDien.query.filter(NhanDien.Updated >= Updated_datefrom, NhanDien.Updated <= (Updated_dateto + " 23:59:59"))
+        except:
+            try:
+                Updated_datefrom = queries["Updated_datefrom"]
+                NhanDienList = NhanDien.query.filter(NhanDien.Updated >= Updated_datefrom)
+            except:
+                try:
+                    Updated_dateto = queries["Updated_dateto"]
+                    NhanDienList = NhanDien.query.filter(NhanDien.Updated <= (Updated_dateto + " 23:59:59"))
+                except:    
+                    NhanDienList = NhanDien.query.all()
+        all_nhandiens = format_nhandiens_list(filter_arr_by_queries(nhanDiensSchema.dump(NhanDienList), queries))
+    except:
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+        # Step 3 : Trả kết quả nhận diện về client
+    return jsonify(
+        Records=all_nhandiens,
+        success=True
+    ), status.HTTP_200_OK
