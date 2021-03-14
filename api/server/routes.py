@@ -234,7 +234,7 @@ def deleteBenh():
 # Step 1 : Check user token
 @check_for_token
 def insertModel():
-    try:
+    # try:
         Ten_M = request.values["Ten_M"]
         Records = Model.query.filter_by(Ten_M=Ten_M)
         # Step 2 : Check tên model đã tồn tại hay chưa
@@ -250,13 +250,13 @@ def insertModel():
         oldModel = Model.query.filter_by(TrangThai=True).first()
         oldModel.TrangThai = False
 
-        try:
-            session.commit()
-        except:
-            return jsonify(
-                    messages=error["HandleFailure"],
-                    success=False
-                ), status.HTTP_400_BAD_REQUEST
+        # try:
+        session.commit()
+        # except:
+        #     return jsonify(
+        #             messages=error["HandleFailure"],
+        #             success=False
+        #         ), status.HTTP_400_BAD_REQUEST
 
         insertModel = Model(Ten_M=Ten_M, Created=datetime.now(), Updated=datetime.now(
         ), Created_function_id="api007", Updated_function_id="api007", Revision=0, TrangThai=True)
@@ -283,16 +283,16 @@ def insertModel():
                     success=False
                 ), status.HTTP_400_BAD_REQUEST
 
-    except:
-        return jsonify(
-            messages=error["HandleFailure"],
-            success=False
-        ), status.HTTP_400_BAD_REQUEST
+    # except:
+    #     return jsonify(
+    #         messages=error["HandleFailure"],
+    #         success=False
+    #     ), status.HTTP_400_BAD_REQUEST
     # Step 6 : Trả về kết quả xử lý
-    return jsonify(
-        Records=1,
-        success=True
-    ), status.HTTP_200_OK
+        return jsonify(
+            Records=1,
+            success=True
+        ), status.HTTP_200_OK
 
 # api008
 @app.route("/insertModelBenh", methods=["POST"])
