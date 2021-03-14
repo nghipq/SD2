@@ -247,6 +247,17 @@ def insertModel():
         Models = request.files["Model"]
         Models.save(f"./server/models/{request.values['Ten_M']}.pickle")
         # Step 4 : Tạo model mới
+        oldModel = Model.query.filter_by(TrangThai=True).first()
+        oldModel.TrangThai = False
+
+        try:
+            session.commit()
+        except:
+            return jsonify(
+                    messages=error["HandleFailure"],
+                    success=False
+                ), status.HTTP_400_BAD_REQUEST
+
         insertModel = Model(Ten_M=Ten_M, Created=datetime.now(), Updated=datetime.now(
         ), Created_function_id="api007", Updated_function_id="api007", Revision=0, TrangThai=True)
         try:
@@ -262,7 +273,7 @@ def insertModel():
         # Step 5 : Tạo model bệnh mới
         BenhList = request.values["BenhList"]
         BenhLists = json.loads(BenhList)
-        print(BenhLists)
+
         for benh in BenhLists:
             try:
                 insertMB(Id_M, benh["Id_B"], benh["STT"],True)
