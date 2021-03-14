@@ -112,7 +112,6 @@ def insertYKien():
         Nhandien.YKien = request.values["YKien"]
         Nhandien.Update = datetime.now()
         Nhandien.Updated_function_id = "api002"
-        Nhandien.Id_ND = Id_ND
         db.session.commit()
     except:
         return jsonify(
@@ -184,7 +183,7 @@ def insertBenh():
 # Step 1 : Check user token
 @check_for_token
 def updateBenh():
-    # Step 2 : Tạo bệnh mới
+    # # Step 2 : Tạo bệnh mới
     try:
         Id_B = request.values["Id_B"]
         benh = Benh.query.filter_by(Id_B=Id_B).first()
@@ -194,7 +193,6 @@ def updateBenh():
         benh.GhiChu = request.values["GhiChu"]
         benh.Updated = datetime.now()
         benh.Updated_function_id = "api005"
-        benh.Revision += 1
         benh.TrangThai = True
         benh.Id_B = Id_B
         db.session.commit()
