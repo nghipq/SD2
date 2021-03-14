@@ -37,10 +37,12 @@ def Logout():
 def detect():
     # Step 1 : Select model nhận diện
     try:
-        Id_M = Model.query.filter_by(TrangThai=True).first().Id_M
+        M = Model.query.filter_by(TrangThai=True).first()
+        Id_M = M.Id_M
+        Ten_M = M.Ten_M
     except:
         return jsonify(
-            messages="Get Id_M",
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 2 : Lưu file ảnh vào hệ thống
@@ -50,12 +52,12 @@ def detect():
         f.save("./server/img/"+DiaChiAnh)
     except:
         return jsonify(
-            messages="save img",
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 3 : Phân loại bệnh
     try:
-        STT = int(detect_tom_desease(DiaChiAnh)) + 1
+        STT = int(detect_tom_desease(DiaChiAnh, Ten_M)) + 1
         if STT == 0:
             return jsonify(
                 messages=error["cannotDetection"],
@@ -63,7 +65,7 @@ def detect():
             ), status.HTTP_400_BAD_REQUEST
     except:
         return jsonify(
-            messages="detect fail",
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 4 : Lấy thông tin bệnh
@@ -72,7 +74,7 @@ def detect():
         B = Benh.query.filter_by(Id_B=Id_B).first()
     except:
         return jsonify(
-            messages="get benh",
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 5 : Tạo thông tin nhận diện mới
@@ -85,7 +87,7 @@ def detect():
             NhanDien.Id_ND.desc()).first().Id_ND
     except:
         return jsonify(
-            messages="insert nhan dien",
+            messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
    # Step 6 : Trả kết quả nhận diện về client
