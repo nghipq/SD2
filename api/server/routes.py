@@ -91,16 +91,16 @@ def detect():
             success=False
         ), status.HTTP_400_BAD_REQUEST
    # Step 6 : Trả kết quả nhận diện về client
-        return jsonify(
-            Id_ND=Id_ND,
-            Id_B=Id_B,
-            ImgName=DiaChiAnh,
-            Ten_B=B.Ten_B,
-            ThongTin_B=B.ThongTin_B,
-            CachChuaTri=B.CachChuaTri,
-            GhiChu=B.GhiChu,
-            success=True
-        ), status.HTTP_200_OK
+    return jsonify(
+        Id_ND=Id_ND,
+        Id_B=Id_B,
+        ImgName=DiaChiAnh,
+        Ten_B=B.Ten_B,
+        ThongTin_B=B.ThongTin_B,
+        CachChuaTri=B.CachChuaTri,
+        GhiChu=B.GhiChu,
+        success=True
+    ), status.HTTP_200_OK
 
 # api002
 @app.route("/insertYKien", methods=["POST"])
