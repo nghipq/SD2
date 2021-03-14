@@ -339,7 +339,6 @@ def updateModel():
         Models.Ten_M = Ten_M
         Models.Updated = datetime.now()
         Models.Updated_function_id = "api009"
-        Models.Revision += 1
         Models.TrangThai = True
         Models.Id_M = Id_M
         db.session.commit()
