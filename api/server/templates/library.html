@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Thư viện ảnh</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-with, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lightbox.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/lightbox-plus-jquery.min.js')}}"></script>
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+</head>
+
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Dashboard</a>
+        <!-- Navbar-->
+        <ul class="navbar-nav ml-auto mr-md-0">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                    <a class="dropdown-item" href="/logout">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <a class="nav-link" href="/admin">
+                            <div class="sb-nav-link-icon"><i class="fas fa-bed"></i></div>
+                            Bệnh (Disease)
+                        </a>
+                        <a class="nav-link" href="/admin/anh">
+                            <div class="sb-nav-link-icon"><i class="far fa-image"></i></div>
+                            Hình ảnh (Photo)
+                        </a>
+
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid">
+
+                    <div class="row card-header">
+                        <div class=" ml-auto ml-md-0 mt-2">
+                            <h4>Quản lý thư viện ảnh (Photo management)</h4>
+                        </div>
+
+                        <div class=" ml-auto mr-md-0">
+                            <a class="btn btn-lg" href="/exportImage">
+                                <i class="fas fa-download fa-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="gallery" id="gallery">
+
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        axios.get("/NhanDienList").then(res => {
+            var data = res.data
+            var value = []
+            for (item of data.Records) {
+                value += ` <a href="/loadImage?ImageName=${item.ImgName}" data-lightbox="mygallery" 
+                data-title="${item.ImgName} </br> Email người dùng: ${item.Email} </br> Ý kiến người dùng: ${item.YKien}"> <img src="/loadImage?ImageName=${item.ImgName}"></a>
+                        `
+            }
+            document.getElementById("gallery").innerHTML = value
+        })
+    </script>
+</body>
+
+</html>

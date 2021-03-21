@@ -2,3 +2,5 @@ api/server/__pycache__
 .history
 api/venv/
 api/server/data.sqlite
+api/server/img
+api/server/models

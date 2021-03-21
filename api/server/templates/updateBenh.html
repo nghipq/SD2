@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Cập nhật bệnh</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/update.css') }}"> -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+    <style>
+        body {
+            background-color: rgba(82, 209, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    {% if benh %}
+    <div class="container">
+        <div class="row justify-content-around">
+            <div class="col-md-6 mt-5">
+                <!-- Material form register -->
+                <div class="card">
+
+                    <h5 class="card-header info-color white-text text-center py-4">
+                        <strong>Cập nhật bệnh (Update disease)</strong>
+                    </h5>
+                    <div class="card-body px-lg-5 pt-0">
+                        <div class="text-center" style="color: #757575;" action="#!">
+                            <input type="hidden" id="Id_B" value="{{benh.Id_B}}">
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="md-form mb-2">
+                                        <p class="text-left mb-1"><i>Tên bệnh (Name of disease)</i></p>
+                                        <input type="text" id="Ten_B" name="Ten_B" value="{{benh.Ten_B}}" class="form-control mb-0" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="md-form mb-2">
+                                        <p class="text-left mb-1"><i>Thông tin chi tiết bệnh (Disease information)</i></p>
+
+                                        <textarea id="ThongTin_B" class="col form-control md-textarea" rows="2">{{benh.ThongTin_B}}</textarea>
+
+                                        <!-- <input type="text" id="ThongTin_B" name="ThongTin_B" value="{{benh.ThongTin_B}}"
+                                            class="form-control">
+                                        <label for="ThongTin_B">Thông tin chi tiết bệnh (Disease information)</label> -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="md-form mb-2">
+                                        <p class="text-left mb-1"><i>Cách chữa trị bệnh (Cure)</i></p>
+                                        <textarea id="CachChuaTri" name="CachChuaTri" class="col form-control md-textarea" rows="2">{{benh.CachChuaTri}}</textarea>
+                                        <!-- <input type="text" id="CachChuaTri" name="CachChuaTri"
+                                            value="{{benh.CachChuaTri}}" class="form-control">
+                                        <label for="CachChuaTri">Cách chữa trị bệnh (Cure)</label> -->
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="md-form mb-2">
+                                        <p class="text-left mb-1"><i>Ghi chú</i></p>
+                                        <textarea id="GhiChu" class="form-control md-textarea" rows="2">{{benh.GhiChu}}</textarea>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0" type="submit " onclick="update()">Cập nhật (Update)</button>
+                        </div>
+                        <a href="/admin">
+                            <button class="btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0" type="submit">Hủy (Cancel)</button>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <script src="../static/ckeditor5-build-classic/ckeditor.js"></script>
+    <script>
+        var ThongTin;
+        var CachChua;
+        //CKEDITOR.replace( 'ThongTin_B' );
+        ClassicEditor.create(document.getElementById("ThongTin_B"))
+            .then(editor => {
+                ThongTin = editor;
+            })
+            .catch(err => {
+                console.error(err.stack);
+            });
+
+        ClassicEditor.create(document.getElementById("CachChuaTri"))
+            .then(editor => {
+                CachChua = editor;
+            })
+            .catch(err => {
+                console.error(err.stack);
+            });
+    </script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        function update() {
+            let body = new FormData()
+            body.append("Id_B", document.getElementById("Id_B").value)
+            body.append("Ten_B", document.getElementById("Ten_B").value)
+            body.append("ThongTin_B", ThongTin.getData())
+            body.append("CachChuaTri", CachChua.getData())
+            body.append("GhiChu", document.getElementById("GhiChu").value)
+            body.append("TrangThai", true)
+            axios({
+                method: "PATCH",
+                url: "/updateBenh",
+                data: body,
+                headers: {
+                    'Authentication': sessionStorage.getItem("Authentication"),
+                    'Content-Type': "multipart/form-data"
+                }
+            }).then(res => {
+                if (res.data.success) {
+
+                    alert('Cập nhật thành công !')
+                    location.href = "/admin"
+                } else {
+                    alert('Cập nhật không thành công !')
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

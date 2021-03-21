@@ -1,6 +1,6 @@
 from server import app, db
 from server.models import Admins, adminSchema, adminsSchema, Model, modelSchema, modelsSchema, Benh, benhSchema, benhsSchema, ModelBenh, modelSchema, modelsSchema, NhanDien, nhanDienSchema, nhanDiensSchema
-from flask import jsonify, request, session, send_file, send_from_directory
+from flask import jsonify, request, session, send_file, send_from_directory, render_template
 from flask_api import status
 import os
 import hashlib
@@ -16,6 +16,7 @@ import shutil
 def check_for_token(func):
     @wraps(func)
     def wrapped(*args, **kwargs):
+        print(request.headers)
         token = request.headers['Authentication']
         if not token:
             Logout()
@@ -30,7 +31,7 @@ def check_for_token(func):
 @app.route("/logout", methods=["GET"])
 def Logout():
     session['logged_in'] = False
-    return "logout"
+    return render_template("login.html")
 
 # api001
 @app.route("/detect", methods=["POST"])
@@ -189,8 +190,8 @@ def updateBenh():
         benh.GhiChu = request.values["GhiChu"]
         benh.Updated = datetime.now()
         benh.Updated_function_id = "api005"
-        benh.Revision += 1
-        benh.TrangThai = True
+        benh.Revision = (benh.Revision + 1)
+        benh.TrangThai = bool(request.values["TrangThai"])
         benh.Id_B = Id_B
         db.session.commit()
     except:
@@ -242,6 +243,17 @@ def insertModel():
         Models = request.files["Model"]
         Models.save(f"./server/models/{request.values['Ten_M']}.pickle")
         # Step 4 : Tạo model mới
+        oldModel = Model.query.filter_by(TrangThai=True).first()
+        oldModel.TrangThai = False
+
+        try:
+            db.session.commit()
+        except:
+            return jsonify(
+                    messages=error["HandleFailure"],
+                    success=False
+                ), status.HTTP_400_BAD_REQUEST
+
         insertModel = Model(Ten_M=Ten_M, Created=datetime.now(), Updated=datetime.now(
         ), Created_function_id="api007", Updated_function_id="api007", Revision=0, TrangThai=True)
         try:
@@ -257,7 +269,7 @@ def insertModel():
         # Step 5 : Tạo model bệnh mới
         BenhList = request.values["BenhList"]
         BenhLists = json.loads(BenhList)
-        print(BenhLists)
+        print(BenhList)
         for benh in BenhLists:
             try:
                 insertMB(Id_M, benh["Id_B"], benh["STT"],True)
@@ -325,8 +337,8 @@ def updateModel():
         Models.Ten_M = Ten_M
         Models.Updated = datetime.now()
         Models.Updated_function_id = "api009"
-        Models.Revision += 1
-        Models.TrangThai = True
+        Models.Revision = (Models.Revision + 1)
+        Models.TrangThai = bool(request.values["TrangThai"])
         Models.Id_M = Id_M
         db.session.commit()
         # Step 6 : Tạo model bệnh mới
