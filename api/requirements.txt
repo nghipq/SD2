@@ -3,6 +3,7 @@ Cython==0.29.22
 Flask==1.1.2
 Flask-API==2.0
 Flask-Cors==3.0.10
+Flask-API==2.0
 flask-marshmallow==0.14.0
 Flask-SQLAlchemy==2.4.4
 itsdangerous==1.1.0
@@ -11,15 +12,16 @@ joblib==1.0.1
 MarkupSafe==1.1.1
 marshmallow==3.10.0
 numpy==1.20.1
-opencv-contrib-python==3.4.13.47
-opencv-python==3.4.13.47
+opencv-python==3.4.2.17
+opencv-contrib-python==3.4.2.17
 pandas==1.2.3
 PyJWT==1.7.1
 python-dateutil==2.8.1
 pytz==2021.1
-scikit-learn==0.24.1
+scikit-learn==0.21.3
 scipy==1.6.1
 six==1.15.0
 SQLAlchemy==1.3.23
 threadpoolctl==2.1.0
 Werkzeug==1.0.1
+uWSGI==2.0.18

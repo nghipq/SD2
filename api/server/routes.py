@@ -5,7 +5,7 @@ from flask_api import status
 import os
 import hashlib
 import jwt
-from server.until import get_queries, insertMB, deleteMB, format_benhs_list, filter_arr_by_queries, format_nhandiens_list, format_models_list
+from server.until import get_queries, insertMB, deleteMB, format_benhs_list, filter_arr_by_queries, format_nhandiens_list, format_models_list, detect_tom_desease
 from datetime import date, datetime, timedelta
 from server.msg import error, success
 from functools import wraps
@@ -37,13 +37,15 @@ def Logout():
 def detect():
     # Step 1 : Select model nhận diện
     try:
-        Id_M = Model.query.filter_by(TrangThai=True).first().Id_M
+        M = Model.query.filter_by(TrangThai=True).first()
+        Id_M = M.Id_M
+        Ten_M = M.Ten_M
     except:
         return jsonify(
             messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-    # Step 2 : Lưu file ảnh vào hệ thống
+    # # Step 2 : Lưu file ảnh vào hệ thống
     try:
         DiaChiAnh = datetime.now().strftime("%d%m%Y_%H%M%S") + ".jpg"
         f = request.files['image']
@@ -53,19 +55,22 @@ def detect():
             messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
-    # Step 3 : Phân loại bệnh
-    # try:
-    #     DiaChiAnh = datetime.now().strftime("%d%m%Y_%H%M%S") + ".jpg"
-    #     f = request.files['image']
-    #     f.save("./server/img/"+DiaChiAnh)
-    # except:
-    #     return jsonify(
-    #         messages=error["HandleFailure"],
-    #         success=False
-    #     ), status.HTTP_400_BAD_REQUEST
-    # Step 4 : Lấy thông tin bệnh
+    # # Step 3 : Phân loại bệnh
     try:
-        Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=1).first().Id_B
+        STT = int(detect_tom_desease(DiaChiAnh, Ten_M)) + 1
+        if STT == 0:
+            return jsonify(
+                messages=error["cannotDetection"],
+                success=False
+            ), status.HTTP_400_BAD_REQUEST
+    except:
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # # Step 4 : Lấy thông tin bệnh
+    try:
+        Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=STT).first().Id_B
         B = Benh.query.filter_by(Id_B=Id_B).first()
     except:
         return jsonify(
@@ -74,8 +79,8 @@ def detect():
         ), status.HTTP_400_BAD_REQUEST
     # Step 5 : Tạo thông tin nhận diện mới
     try:
-        insertNhanDien = NhanDien(DiaChiAnh=DiaChiAnh, Email=request.values["Email"], Id_B=Id_B, YKien="", Created=datetime.now(
-        ), Updated=datetime.now(), Created_function_id="API001", Updated_function_id="API001", Revision=0, TrangThai=True)
+        insertNhanDien = NhanDien(DiaChiAnh=DiaChiAnh, Email=request.values["Email"], Id_B=Id_B, YKien="", Created=datetime.now(), 
+        Updated=datetime.now(), Created_function_id="API001", Updated_function_id="API001", Revision=0, TrangThai=True)
         db.session.add(insertNhanDien)
         db.session.commit()
         Id_ND = db.session.query(NhanDien).order_by(
@@ -87,15 +92,15 @@ def detect():
         ), status.HTTP_400_BAD_REQUEST
    # Step 6 : Trả kết quả nhận diện về client
     return jsonify(
-        Id_ND=Id_ND,
-        Id_B=Id_B,
-        ImgName=DiaChiAnh,
-        Ten_B=B.Ten_B,
-        ThongTin_B=B.ThongTin_B,
-        CachChuaTri=B.CachChuaTri,
-        GhiChu=B.GhiChu,
-        success=True
-    ), status.HTTP_200_OK
+            Id_ND=Id_ND,
+            Id_B=Id_B,
+            ImgName=DiaChiAnh,
+            Ten_B=B.Ten_B,
+            ThongTin_B=B.ThongTin_B,
+            CachChuaTri=B.CachChuaTri,
+            GhiChu=B.GhiChu,
+            success=True
+        ), status.HTTP_200_OK
 
 # api002
 @app.route("/insertYKien", methods=["POST"])
@@ -107,7 +112,6 @@ def insertYKien():
         Nhandien.YKien = request.values["YKien"]
         Nhandien.Update = datetime.now()
         Nhandien.Updated_function_id = "api002"
-        Nhandien.Id_ND = Id_ND
         db.session.commit()
     except:
         return jsonify(
@@ -179,7 +183,7 @@ def insertBenh():
 # Step 1 : Check user token
 @check_for_token
 def updateBenh():
-    # Step 2 : Tạo bệnh mới
+    # # Step 2 : Tạo bệnh mới
     try:
         Id_B = request.values["Id_B"]
         benh = Benh.query.filter_by(Id_B=Id_B).first()
@@ -189,7 +193,6 @@ def updateBenh():
         benh.GhiChu = request.values["GhiChu"]
         benh.Updated = datetime.now()
         benh.Updated_function_id = "api005"
-        benh.Revision += 1
         benh.TrangThai = True
         benh.Id_B = Id_B
         db.session.commit()
@@ -242,6 +245,17 @@ def insertModel():
         Models = request.files["Model"]
         Models.save(f"./server/models/{request.values['Ten_M']}.pickle")
         # Step 4 : Tạo model mới
+        oldModel = Model.query.filter_by(TrangThai=True).first()
+        oldModel.TrangThai = False
+
+        try:
+            db.session.commit()
+        except:
+            return jsonify(
+                    messages=error["HandleFailure"],
+                    success=False
+                ), status.HTTP_400_BAD_REQUEST
+
         insertModel = Model(Ten_M=Ten_M, Created=datetime.now(), Updated=datetime.now(
         ), Created_function_id="api007", Updated_function_id="api007", Revision=0, TrangThai=True)
         try:
@@ -257,7 +271,7 @@ def insertModel():
         # Step 5 : Tạo model bệnh mới
         BenhList = request.values["BenhList"]
         BenhLists = json.loads(BenhList)
-        print(BenhLists)
+
         for benh in BenhLists:
             try:
                 insertMB(Id_M, benh["Id_B"], benh["STT"],True)
@@ -274,9 +288,9 @@ def insertModel():
         ), status.HTTP_400_BAD_REQUEST
     # Step 6 : Trả về kết quả xử lý
     return jsonify(
-        Records=1,
-        success=True
-    ), status.HTTP_200_OK
+            Records=1,
+            success=True
+        ), status.HTTP_200_OK
 
 # api008
 @app.route("/insertModelBenh", methods=["POST"])
@@ -325,7 +339,6 @@ def updateModel():
         Models.Ten_M = Ten_M
         Models.Updated = datetime.now()
         Models.Updated_function_id = "api009"
-        Models.Revision += 1
         Models.TrangThai = True
         Models.Id_M = Id_M
         db.session.commit()

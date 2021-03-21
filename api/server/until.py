@@ -12,45 +12,44 @@ from datetime import date, datetime, timedelta
 from server import app, db
 from server.models import Admins, adminSchema, adminsSchema, Model, modelSchema, modelsSchema, Benh, benhSchema, benhsSchema, ModelBenh, modelSchema, modelsSchema, ModelBenh, modelBenhSchema, modelBenhsSchema, NhanDien, nhanDienSchema, nhanDiensSchema
 
-# vectors_file = [("training_set_dom_den.csv", 0), ("training_set_dom_trang.csv", 1), ("training_set_den_mang.csv", 0),
-# ("training_set_hoai_tu_co.csv", 1), ("training_set_hoai_tu_gan.csv", 0), ("training_set_tom_bt.csv", 2)]
-# kmeans = []
+vectors_file = [("training_set_dom_den.csv", 0), ("training_set_dom_trang.csv", 1), ("training_set_den_mang.csv", 0), 
+("training_set_hoai_tu_co.csv", 1), ("training_set_hoai_tu_gan.csv", 0), ("training_set_tom_bt.csv", 2)]
+kmeans = []
 
-# for File, clr in vectors_file:
-#     data = pd.read_csv(f"./vector_surf_tom/{File}")
-#     #k-means clusters with 4
-#     kmean = KMeans(n_clusters=4, random_state=0).fit(data.values)
-#     kmeans.append((kmean, clr))
-# def detect_tom_desease(img, Ten_M):
-#     surf = cv2.xfeatures2d.SURF_create(5000)
+for File, clr in vectors_file:
+    data = pd.read_csv(f"./server/vector_surf_tom/{File}")
+    #k-means clusters with 4    
+    kmean = KMeans(n_clusters=4, random_state=0).fit(data.values)
+    kmeans.append((kmean, clr))
 
-#     with open(f"./models/{Ten_M}.pickle", "rb") as file:
-#         clf = pickle.load(file)
+def detect_tom_desease(img, Ten_M):
+    surf = cv2.xfeatures2d.SURF_create(5000)
 
-#         image = cv2.imread(os.path.join("./img", img))
-#         image = cv2.resize(image, (256, 128))
+    with open(f"./server/models/{Ten_M}.pickle", "rb") as file:
+        clf = pickle.load(file)
 
-#         _, des = surf.detectAndCompute(image,None)
+        image = cv2.imread(os.path.join("./server/img", img))
+        image = cv2.resize(image, (256, 128))
 
-#         ans = []
+        _, des = surf.detectAndCompute(image,None)
 
-#         for i in range(len(kmeans)):
-#             rs = kmeans[i][0].predict(des)
-#             data = []
-#             for j in range(len(des)):
-#                 if rs[j] == kmeans[i][1]:
-#                     data.append(des[j])
-#             if len(data) > 0:
-#                 pre = clf.predict(data)
-#                 dect = int(np.argmax(np.bincount(pre.astype(int))))
-#                 if(dect == i):
-#                     ans.append(dect)
+        ans = []
 
-#         print(ans)
-#         if len(ans) > 0:
-#             return ans[0]
-#         return -1
-# detect_tom_desease("DomTrang_01","Nhan_Dien_Benh_Tom1")
+        for i in range(len(kmeans)):
+            rs = kmeans[i][0].predict(des)
+            data = []
+            for j in range(len(des)):
+                if rs[j] == kmeans[i][1]:
+                    data.append(des[j])
+            if len(data) > 0:
+                pre = clf.predict(data)
+                dect = int(np.argmax(np.bincount(pre.astype(int))))
+                if(dect == i):
+                    ans.append(dect)
+
+        if len(ans) > 0:
+            return ans[0]
+        return -1
 
 #Get query from DB
 def get_queries(request):
