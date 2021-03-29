@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Đăng nhập</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}"> -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<script>
+    if (location.href.indexOf("login") == -1) {
+        sessionStorage.removeItem('Authentication')
+        location.href = "/login"
+    }
+</script>
+
+<body>
+
+    <div class="container">
+        <div class="row justify-content-around">
+            <div class="col-md-6 mt-5">
+                <div class="card">
+
+                    <h5 class="card-header info-color white-text text-center py-4">
+                        <strong>Đăng nhập (Login)</strong>
+                    </h5>
+                    <div class="card-body px-lg-5">
+                        <div class="text-center" style="color: #757575;" action="">
+                            <div class="md-form mt-3">
+                                <input type="text" id="User" class="form-control" required>
+                                <label for="User">Tên đăng nhập (username)</label>
+                            </div>
+                            <div class="md-form">
+                                <input type="password" id="Password" class="form-control" required>
+                                <label for="Password">Mật khẩu (password)</label>
+                            </div>
+                            <h5 style="text-align: center;">
+                                <strong style="color:red;" id="Message"> </strong>
+                            </h5>
+                            <button class="btn btn-outline-info btn-rounded btn-block z-depth-0 my-4 waves-effect" type="submit" onclick="login()">Đăng nhập (Login)</button>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+        function login() {
+            username = document.getElementById("User");
+            password = document.getElementById("Password");
+
+            let body = new FormData()
+            body.append("username", username.value)
+            body.append("password", password.value)
+
+            axios({
+                method: "POST",
+                url: "/login",
+                data: body,
+                header: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }).then(res => {
+                if (res.data.success) {
+                    sessionStorage.setItem('Authentication', res.data.token)
+                    location.href = `/admin`
+                } else {
+                    document.getElementById("Message").innerHTML = res.data.message
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

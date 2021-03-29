@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Danh sách bệnh đã xóa</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-with, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet"
+        crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <!-- data table -->
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#example').dataTable({});
+        });
+    </script>
+</head>
+
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Dashboard</a>
+        <!-- Navbar-->
+        <ul class="navbar-nav ml-auto mr-md-0">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                    <a class="dropdown-item" href="/logout">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <a class="nav-link" href="/admin">
+                            <div class="sb-nav-link-icon"><i class="fas fa-bed"></i></div>
+                            Bệnh (Disease)
+                        </a>
+                        <a class="nav-link" href="/admin/anh">
+                            <div class="sb-nav-link-icon"><i class="far fa-image"></i></div>
+                            Hình ảnh (Photo)
+                        </a>
+
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid">
+                    <div class="row card-header">
+                        <div class=" ml-auto ml-md-0 mt-2">
+                            <h4>Quản lý bệnh</h4>
+                        </div>
+                        <div class=" ml-auto mr-md-0 mt-1">
+                            <a href="/admin">
+                                <button type="button" class="btn btn-dark">Danh sách bệnh</button>
+                            </a>
+                        </div>
+                       
+                    </div>
+
+                    <div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <table id="example" class="table table-bordered dataTable table-striped "
+                                            id="dataTable" width="100%" cellspacing="0" role="grid"
+                                            aria-describedby="dataTable_info" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID Bệnnh<br> (Id)</th>
+                                                    <th>Tên bệnh<br> (Name)</th>
+                                                    <th>Thông tin bệnh<br> (Information)</th>
+                                                    <th>Cách chữa trị <br> (Cure)</th>
+                                                    <th>Ghi chú <br> (Note)</th>
+                                                    <th>Khôi phục <br>(Restore)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="Benhs">
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <!-- Add .modal-dialog-centered to .modal-dialog to vertically center the modal -->
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Bạn có chắc chắn muốn khôi phục không? <br> (Are you sure to restore?)</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Không (No)</button>
+                    <button type="button" class="btn btn-primary" id="recycleBenh">Có (Yes)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        axios.get("/benhListDeleted").then(res => {
+            var data = res.data
+            var tableBody = document.getElementById("Benhs")
+            var value = ""
+            for (item of data.data) {
+                value += `<tr>
+                            <td>${item.Id_B}</td>
+                            <td>${item.Ten_B}</td>
+                            <td>${item.ThongTin_B}</td>
+                            <td>${item.CachChuaTri}</td>
+                            <td>${item.GhiChu}</td>
+                            <td><button type="button" style="border: none; background: transparent"  data-toggle="modal" onclick="recycleB(${item.Id_B})" data-target="#exampleModalCenter">
+                                <i class="fa fa-recycle"></i></button></td>
+                           
+                        </tr>`
+            }
+            tableBody.innerHTML = value
+        })
+
+        function recycleB(Id_B){
+                var dlt = document.getElementById("recycleBenh")
+                dlt.innerHTML = `<a onclick="recycleBenh(${Id_B})">Có</a>`
+                console.log(dlt)
+        }
+
+        function recycleBenh(Id_B) {
+            axios.get(`/recycleBenh?Id_B=${Id_B}`, option = {
+                headers: {
+                    'Authentication': sessionStorage.getItem("Authentication")
+                }
+            }).then(res => {
+                alert(res.data.message)
+                location.href = "/admin"
+            })
+        }
+    </script>
+
+</body>
+
+</html>
