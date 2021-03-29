@@ -3,3 +3,5 @@ api/server/__pycache__
 api/venv/
 api/server/data.sqlite
 api/server/data_anh_benh.zip
+api/server/img
+api/server/models

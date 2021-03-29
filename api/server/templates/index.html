@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Nhận diện bệnh trên tôm</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <link class="jsbin" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.0/jquery-ui.min.js"></script>
+    <!-- md bootstrap -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+
+</head>
+
+<body class="m-0 p-0">
+    <input type="hidden" id="Id_ND">
+    <!--Modal: Login with Avatar Form-->
+    <div class="modal fade" id="modalLoginAvatar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog cascading-modal modal-avatar modal-sm" role="document">
+            <!--Content-->
+            <div class="modal-content">
+                <!--Body-->
+                <div class="modal-body text-center mb-1">
+                    <div class="md-form ml-0 mr-0">
+                        <input type="email" id="Email" class="form-control form-control-sm validate ml-0">
+                        <label data-error="wrong" data-success="right" for="Email" class="ml-0">Nhập email của
+                            bạn (Enter your email)</label>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-cyan mt-1" onclick="nhanDien()" data-dismiss="modal">Gửi (Send) <i
+                                class="fas fa-sign-in ml-1"></i></button>
+                        <button class="btn btn-cyan mt-1" data-dismiss="modal">Hủy (Cancel) <i
+                                class="fas fa-sign-in ml-1"></i></button>
+                    </div>
+
+                </div>
+
+            </div>
+            <!--/.Content-->
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="title mt-3 text-center ">
+            <h1>
+                e-Expert for classification of shrimp's diseases<br>
+                <small class="text-muted">(Beta version for data collection)</small>
+            </h1>
+
+        </div>
+
+        <div class="row justify-content-around mt-3">
+            <div class="col col-4 border border-light  ">
+                <div>
+
+                    <div class="justify-content-md-center mt-3">
+                        <h5 class="card-header info-color white-text text-center py-3">
+                            <strong>Chọn tệp (Choose file)</strong>
+
+                        </h5>
+
+                        <div class="input-group mb-3 mt-3">
+                            <div class="custom-file" id="file_field">
+                                <input type='file' onchange="readURL(this);" style="display: block;" class="custom-file-input" accept="image/*" id="Image" required/>
+                                <label id="labelImg" class="custom-file-label" style="overflow: hidden;"></label>
+                            </div>
+
+                        </div>
+
+                        <div class="text-center mb-5" id="showText" style="height: 10rem;">
+                            <p>Chưa có ảnh nào được chọn <br> There is no picture </p>
+
+                        </div>
+                        <div class="img img-fluid mb-3" id="showImg" style="display: none; height: 10rem;">
+                            <img id="blah" src="#" alt="Chưa có ảnh nào được chọn" class="mb-2 rounded mx-auto d-block img-responsive img-portfolio img-hover" />
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-info btn-rounded btn-lg " data-toggle="modal" data-target="#modalLoginAvatar">Gửi (Send)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col col-7 border border-light  ">
+                <div class="mt-3 ">
+                    <h5 class="card-header info-color white-text text-center py-3">
+                        <strong>Kết quả chuẩn đoán (Diagnostic results)</strong>
+                    </h5>
+                    <div class="rs border rounded mt-3" style="overflow-y:scroll ;">
+                        <h5 id="Ten_B"></h5>
+                        <p id="ThongTin"></p>
+
+                    </div>
+
+                    <div class="mt-3">
+                        <h5> <i>Đóng góp ý kiến (Feedback)</i></h5>
+                        <textarea placeholder="Nhập ý kiến của bạn ở đây" id="yKien"> </textarea>
+                    </div>
+
+                    <div class="text-center ">
+                        <button type="button" class="btn btn-info btn-rounded btn-lg" onclick="guiYKien()">Gửi
+                            (Send)</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col col-4 ml-3" style="background:none">
+                <div class="row" id="imgList"></div>
+            </div>
+
+
+        </div>
+    </div>
+    <footer class="bg-white mt-3">
+        <div class="row justify-content-md-center" style="width: 100%;">
+
+            <div class="col-6 just">
+
+                <div class="text-center">
+                    <h4> Thông tin liên hệ </h4>
+                </div>
+                <div class="row">
+
+                    <div class="col-6 text-center ">
+                        <p class="p-0 m-0" style="font-weight: bold;">Nguyễn Chí Ngôn </p>
+                        <p> <i class="fas fa-envelope"></i>
+                            <i>Email: ncngon@ctu.edu.vn</i>
+                        </p>
+                    </div>
+                    <div class="col-6 text-center">
+                        <p class=" p-0 m-0" style="font-weight: bold;">Quách Luyl Đa </p>
+                        <p> <i class="fas fa-envelope"></i>
+                            <i>Email: luyldaquach@gmail.com</i>
+                        </p>
+                    </div>
+
+                </div>
+                <div class="text-center">
+                    (Beta version for data collection)
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    var myPath = new Array();
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                myPath.push(e.target.result);
+
+                $('#blah')
+                    .attr('src', e.target.result)
+                    .width(150)
+                    .height(200);
+            };
+
+            document.getElementById("showImg").style.display = "inline";
+            document.getElementById("showText").style.display = "none";
+            reader.readAsDataURL(input.files[0]);
+
+        }
+    }
+
+    function nhanDien() {
+        var data = new FormData();
+        var Image = document.getElementById("Image")
+
+        if (Image.files.length == 0) {
+            alert("Bạn chưa chọn ảnh!")
+        } else {
+            var Email = document.getElementById("Email")
+            data.append("image", Image.files[0])
+            data.append("Email", Email.value)
+            axios({
+                method: "POST",
+                url: "/detect",
+                data: data,
+                header: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }).then(res => {
+                console.log(res.data)
+                document.getElementById("Ten_B").innerHTML = "Tên bệnh:" + res.data.Ten_B;
+                document.getElementById("ThongTin").innerHTML = "Thông Tin Bệnh:" + res.data.ThongTin_B + "</br>" + "Cách chữa trị: " + res.data.CachChuaTri + "</br> Ghi chú: " + res.data.GhiChu
+                document.getElementById("Id_ND").value = res.data.Id_ND;
+                showImg();
+            })
+            document.getElementById("file_field").innerHTML = `<input type='file' onchange="readURL(this);" style="display: block;"
+                                                            class="custom-file-input" accept="image/*" id="Image" required/>
+                                                            <label id="labelImg" class="custom-file-label" style="overflow: hidden;"></label>`
+        }
+    }
+
+    function guiYKien() {
+        var yKien = document.getElementById("yKien");
+        var Id_ND = document.getElementById("Id_ND")
+        var data = {
+            Id_ND: Id_ND.value,
+            YKien: yKien.value
+        }
+        axios.post("/insertYKien", data).then(res => {
+            alert(res.data.message)
+        })
+    }
+
+    function showImg() {
+
+        var el = document.createElement('div');
+        var str = `<img class='col-4-md m-1 p-1 img' id="newI` + myPath.length + `" alt = "hihi"></img>`
+
+        el.innerHTML = str;
+        document.getElementById('imgList').appendChild(el);
+
+        $("#newI" + myPath.length)
+            .attr('src', myPath[myPath.length - 1])
+            .width(70)
+            .height(110);
+
+        document.getElementById("showImg").style.display = "none";
+        document.getElementById("showText").style.display = "inline";
+        document.getElementById("labelImg").textContent = null;
+    }
+</script>
+
+</html>
