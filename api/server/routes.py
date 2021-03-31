@@ -48,7 +48,8 @@ def detect():
         ), status.HTTP_400_BAD_REQUEST
     # # Step 2 : Lưu file ảnh vào hệ thống
     try:
-        DiaChiAnh = datetime.now().strftime("%d%m%Y_%H%M%S") + ".jpg"
+        DiaChiAnh = datetime.now().strftime("%d%m%Y_%H%M%S") + f"_{len(os.listdir('./server/img'))}.jpg"
+        print(DiaChiAnh)
         f = request.files['image']
         f.save("./server/img/"+DiaChiAnh)
     except:
