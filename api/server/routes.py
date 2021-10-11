@@ -321,7 +321,7 @@ def insertModelBenh():
     # Step 2 : Tạo model bệnh mới
     try:
         insertMB(request.values["Id_M"],
-                 request.values["Id_B"], request.values["STT"],True)
+                 request.values["Id_B"], request.values["STT"] + 1,True)
     except:
         return jsonify(
             messages=error["HandleFailure"],
