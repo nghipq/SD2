@@ -83,8 +83,8 @@ def detect():
     # Step 4 : Lấy thông tin bệnh
     try:
         print("Step 4 start")
-        print(f"Id model: {Id_M}, STT: {STT}")
-        Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=STT).first().Id_B
+        print(f"Id model: {Id_M-1}, STT: {STT}")
+        Id_B = ModelBenh.query.filter_by(Id_M=Id_M-1, STT=STT).first().Id_B
         print(Id_B)
         B = Benh.query.filter_by(Id_B=Id_B).first()
         print("Step 4 success")
