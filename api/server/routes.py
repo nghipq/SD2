@@ -58,18 +58,18 @@ def detect():
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # # Step 3 : Phân loại bệnh
-    try:
-        STT = int(detect_tom_desease(DiaChiAnh, Ten_M)) + 1
-        if STT == 0:
+    # try:
+    STT = int(detect_tom_desease(DiaChiAnh, Ten_M)) + 1
+    if STT == 0:
             return jsonify(
                 messages=error["cannotDetection"],
                 success=False
             ), status.HTTP_400_BAD_REQUEST
-    except:
-        return jsonify(
-            messages=error["HandleFailure"],
-            success=False
-        ), status.HTTP_400_BAD_REQUEST
+    # except:
+    #    return jsonify(
+    #        messages=error["HandleFailure"],
+    #        success=False
+    #    ), status.HTTP_400_BAD_REQUEST
     # # Step 4 : Lấy thông tin bệnh
     try:
         Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=STT).first().Id_B
