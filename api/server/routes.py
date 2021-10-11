@@ -38,56 +38,72 @@ def Logout():
 def detect():
     # Step 1 : Select model nhận diện
     try:
+        print("Step 1 start")
         M = Model.query.filter_by(TrangThai=True).first()
         Id_M = M.Id_M
         Ten_M = M.Ten_M
+        print("Step 1 success")
     except:
+        print("Step 5 faile")
         return jsonify(
             messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # # Step 2 : Lưu file ảnh vào hệ thống
     try:
+        print("Step 2 start")
         DiaChiAnh = datetime.now().strftime("%d%m%Y_%H%M%S") + f"_{len(os.listdir('./server/img'))}.jpg"
         print(DiaChiAnh)
         f = request.files['image']
         f.save("./server/img/"+DiaChiAnh)
+        print("Step 2 success")
     except:
+        print("Step 2 faile")
         return jsonify(
             messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # # Step 3 : Phân loại bệnh
-    # try:
-    STT = int(detect_tom_desease(DiaChiAnh, Ten_M)) + 1
-    if STT == 0:
+    try:
+        print("Step 3 start")
+        STT = int(detect_tom_desease(DiaChiAnh, Ten_M)) + 1
+        if STT == 0:
+            print("Step 3 - STT 0")
             return jsonify(
                 messages=error["cannotDetection"],
                 success=False
             ), status.HTTP_400_BAD_REQUEST
-    # except:
-    #    return jsonify(
-    #        messages=error["HandleFailure"],
-    #        success=False
-    #    ), status.HTTP_400_BAD_REQUEST
-    # # Step 4 : Lấy thông tin bệnh
+        print("Step 3 success")
+    except:
+        print("Step 3 faile")
+        return jsonify(
+            messages=error["HandleFailure"],
+            success=False
+        ), status.HTTP_400_BAD_REQUEST
+    # Step 4 : Lấy thông tin bệnh
     try:
+        print("Step 4 - Lay thong tin benh")
         Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=STT).first().Id_B
         B = Benh.query.filter_by(Id_B=Id_B).first()
+        print("Step 4 success")
     except:
+        print("Step 4 faile")
         return jsonify(
             messages=error["HandleFailure"],
             success=False
         ), status.HTTP_400_BAD_REQUEST
     # Step 5 : Tạo thông tin nhận diện mới
     try:
+        print("Step 5 start")
         insertNhanDien = NhanDien(DiaChiAnh=DiaChiAnh, Email=request.values["Email"], Id_B=Id_B, YKien="", Created=datetime.now(), 
         Updated=datetime.now(), Created_function_id="API001", Updated_function_id="API001", Revision=0, TrangThai=True)
         db.session.add(insertNhanDien)
         db.session.commit()
         Id_ND = db.session.query(NhanDien).order_by(
             NhanDien.Id_ND.desc()).first().Id_ND
+        print("Step 5 success")
     except:
+        print("Step 5 faile")
         return jsonify(
             messages=error["HandleFailure"],
             success=False
