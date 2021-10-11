@@ -82,8 +82,10 @@ def detect():
         ), status.HTTP_400_BAD_REQUEST
     # Step 4 : Lấy thông tin bệnh
     try:
-        print("Step 4 - Lay thong tin benh")
+        print("Step 4 start")
+        print(f"Id model: {Id_M}, STT: {STT}")
         Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=STT).first().Id_B
+        print(Id_B)
         B = Benh.query.filter_by(Id_B=Id_B).first()
         print("Step 4 success")
     except:
