@@ -15,4 +15,4 @@ app.config['SECRET_KEY'] = "f781f2912c6ba76de63a12148f5d1edb933a58ad691cc57f"
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-from server import routes, routersWeb
+from server import routes
