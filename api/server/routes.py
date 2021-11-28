@@ -213,7 +213,7 @@ def updateBenh():
         benh.GhiChu = request.values["GhiChu"]
         benh.Updated = datetime.now()
         benh.Updated_function_id = "api005"
-        benh.Revision = (benh.Revision + 1)
+        benh.Revision = 1
         benh.TrangThai = bool(request.values["TrangThai"])
         benh.Id_B = Id_B
         db.session.commit()
