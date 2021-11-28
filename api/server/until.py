@@ -47,18 +47,9 @@ def detect_tom_desease(img, Ten_M):
                 if(dect == i):
                     ans.append(dect)
 
-        count = dict()
-        rs = 0
-        rsIdx = -1
-
-        for a in ans:
-            for a in ans:
-                count[a] = count.get(a, 0) + 1
-                if count[a] > rs:
-                    rs = count[a]
-                    rsIdx = a
+        print(ans)
         if len(ans) > 0:
-            return rsIdx
+            return ans[0]
         return -1
 
 #Get query from DB
