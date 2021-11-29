@@ -66,7 +66,7 @@ def detect():
     # # Step 3 : Phân loại bệnh
     try:
         print("Step 3 start")
-        STT = int(detect_tom_desease(DiaChiAnh, Ten_M)) + 1
+        STT = int(detect_tom_desease(DiaChiAnh, Ten_M))
         if STT == 0:
             print("Step 3 - STT 0")
             return jsonify(
