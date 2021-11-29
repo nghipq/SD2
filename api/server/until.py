@@ -29,7 +29,7 @@ def detect_tom_desease(img, Ten_M):
       try:
         clf = pickle.load(file)
 
-        image = cv2.imread(img)
+        image = cv2.imread(f"./server/img/{img}")
         image = cv2.resize(image, (256, 128))
 
         _, des = surf.detectAndCompute(image,None)
