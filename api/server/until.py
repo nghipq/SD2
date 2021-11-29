@@ -35,10 +35,10 @@ def detect_tom_desease(img, Ten_M):
         _, des = surf.detectAndCompute(image,None)
 
         ans = []
-        rs = kmeans[1][0].predict(des)
+        rs = kmeans[3][0].predict(des)
         data = []
         for j in range(len(des)):
-            if rs[j] == kmeans[1][1]:
+            if rs[j] == kmeans[3][1]:
                 data.append(des[j])
         if len(data) > 0:
             pre = clf.predict(data)
