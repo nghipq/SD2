@@ -67,8 +67,8 @@ def detect():
     try:
         print("Step 3 start")
         STT = int(detect_tom_desease(DiaChiAnh, Ten_M))
-        if STT == 0:
-            print("Step 3 - STT 0")
+        if STT == -1:
+            print("Step 3 - STT -1")
             return jsonify(
                 messages=error["cannotDetection"],
                 success=False
