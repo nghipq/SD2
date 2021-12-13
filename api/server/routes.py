@@ -11,7 +11,6 @@ from server.msg import error, success
 from functools import wraps
 import json
 import shutil
-
 # check user token
 def check_for_token(func):
     @wraps(func)
@@ -66,7 +65,7 @@ def detect():
     #     ), status.HTTP_400_BAD_REQUEST
     # Step 4 : Lấy thông tin bệnh
     try:
-        Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=1).first().Id_B
+        Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=3).first().Id_B
         B = Benh.query.filter_by(Id_B=Id_B).first()
     except:
         return jsonify(
@@ -190,7 +189,8 @@ def updateBenh():
         benh.GhiChu = request.values["GhiChu"]
         benh.Updated = datetime.now()
         benh.Updated_function_id = "api005"
-        benh.Revision = (benh.Revision + 1)
+        # benh.Revision = (benh.Revision + 1)
+        benh.Revision = 1
         benh.TrangThai = bool(request.values["TrangThai"])
         benh.Id_B = Id_B
         db.session.commit()
