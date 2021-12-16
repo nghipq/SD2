@@ -111,6 +111,7 @@ class NhanDien(db.Model):
     DiaChiAnh = db.Column(db.String(200))
     ThoiGian_ND = db.Column(db.DateTime, default = datetime.utcnow)
     Email = db.Column(db.String(100))
+    Phonenumber = db.Column(db.String(15))
     Id_B = db.Column(db.Integer, db.ForeignKey("benh.Id_B"))
     YKien = db.Column(db.String(500))
     Created = db.Column(db.DateTime, default = datetime.utcnow)
@@ -119,9 +120,10 @@ class NhanDien(db.Model):
     Updated_function_id = db.Column(db.String(20))
     Revision = db.Column(db.Integer, default = 0)
     TrangThai = db.Column(db.Boolean, default = True)
-    def __init__(self, DiaChiAnh, Email, Id_B, YKien, Created, Updated, Created_function_id, Updated_function_id, Revision, TrangThai):
+    def __init__(self, DiaChiAnh, Email, Phonenumber, Id_B, YKien, Created, Updated, Created_function_id, Updated_function_id, Revision, TrangThai):
         self.DiaChiAnh = DiaChiAnh
         self.Email = Email
+        self.Phonenumber = Phonenumber
         self.Id_B = Id_B
         self.YKien = YKien
         self.Created = Created
@@ -133,7 +135,7 @@ class NhanDien(db.Model):
 
 class NhanDienSchema(ma.Schema):
     class Meta:
-        fields = ("Id_ND", "DiaChiAnh", "ThoiGian_ND", "Email", "Id_B", "YKien", "Created", "Updated", "Created_function_id", "Updated_function_id", "Revision", "TrangThai")
+        fields = ("Id_ND", "DiaChiAnh", "ThoiGian_ND", "Email", "Phonenumber", "Id_B", "YKien", "Created", "Updated", "Created_function_id", "Updated_function_id", "Revision", "TrangThai")
 
 nhanDienSchema = NhanDienSchema()
 nhanDiensSchema = NhanDienSchema(many = True)
