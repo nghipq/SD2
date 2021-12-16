@@ -38,14 +38,19 @@
             <div class="modal-content">
                 <!--Body-->
                 <div class="modal-body text-center mb-1">
-                    <div class="md-form ml-0 mr-0">
+                    <div id="email-group" class="md-form ml-0 mr-0">
                         <input type="email" id="Email" class="form-control form-control-sm validate ml-0">
                         <label data-error="wrong" data-success="right" for="Email" class="ml-0">Nhập email của
                             bạn (Enter your email)</label>
                     </div>
+                    <div id="phone-group" style="display: none;" class="md-form ml-0 mr-0">
+                        <input type="text" id="phonenumber" class="form-control form-control-sm validate ml-0">
+                        <label data-error="wrong" data-success="right" for="phonenumber" class="ml-0">Nhập số điện thoại của bạn (Enter your phonenumber)</label>
+                    </div>
+                    <a href="#" id="idphone">Sử dụng số điện thoại</a>
 
                     <div class="text-center mt-4">
-                        <button class="btn btn-cyan mt-1" onclick="nhanDien()" data-dismiss="modal">Gửi (Send) <i
+                        <button class="btn btn-cyan mt-1" onclick="nhanDienFromModal()" data-dismiss="modal">Gửi (Send) <i
                                 class="fas fa-sign-in ml-1"></i></button>
                         <button class="btn btn-cyan mt-1" data-dismiss="modal">Hủy (Cancel) <i
                                 class="fas fa-sign-in ml-1"></i></button>
@@ -92,7 +97,7 @@
                         <div class="img img-fluid mb-3" id="showImg" style="display: none; height: 10rem;">
                             <img id="blah" src="#" alt="Chưa có ảnh nào được chọn" class="mb-2 rounded mx-auto d-block img-responsive img-portfolio img-hover" />
                         </div>
-                        <div class="text-center">
+                        <div class="text-center" id="btnSubmit">
                             <button type="button" class="btn btn-info btn-rounded btn-lg " data-toggle="modal" data-target="#modalLoginAvatar">Gửi (Send)</button>
                         </div>
                     </div>
@@ -186,16 +191,33 @@
         }
     }
 
-    function nhanDien() {
+    function nhanDienFromModal() {
+        var Email = document.getElementById("Email")
+        var Phonenumber = document.getElementById("phonenumber")
+        localStorage.setItem("Email", Email.value)
+        localStorage.setItem("Phonenumber", Phonenumber.value)
+
+        document.getElementById("btnSubmit").innerHTML = "<button type='button' class='btn btn-info btn-rounded btn-lg' onclick='nhanDienFromSubmit()'>Gửi (Send)</button>"
+        nhanDien(Email, Phonenumber)
+    }
+
+    function nhanDienFromSubmit() {
+        var Email = localStorage.getItem("Email")
+        var Phonenumber = localStorage.getItem("Phonenumber")
+
+        nhanDien(Email, Phonenumber)
+    }
+
+    function nhanDien(Email, Phonenumber) {
         var data = new FormData();
         var Image = document.getElementById("Image")
 
         if (Image.files.length == 0) {
             alert("Bạn chưa chọn ảnh!")
         } else {
-            var Email = document.getElementById("Email")
             data.append("image", Image.files[0])
-            data.append("Email", Email.value)
+            data.append("Email", Email)
+            data.append("Phonenumber", Phonenumber)
             axios({
                 method: "POST",
                 url: "/detect",
@@ -245,6 +267,19 @@
         document.getElementById("showText").style.display = "inline";
         document.getElementById("labelImg").textContent = null;
     }
+
+    document.getElementById("idphone").onclick = function() {
+        var getText = document.getElementById("idphone").textContent;
+        if (getText == 'Sử dụng số điện thoại') {
+            document.getElementById("idphone").innerHTML = 'Sử dụng email';
+            document.getElementById("email-group").style = 'display: none';
+            document.getElementById("phone-group").style = 'display: block';
+        } else {
+            document.getElementById("idphone").innerHTML = 'Sử dụng số điện thoại';
+            document.getElementById("email-group").style = 'display: block';
+            document.getElementById("phone-group").style = 'display: none';
+        }
+    };
 </script>
 
 </html>

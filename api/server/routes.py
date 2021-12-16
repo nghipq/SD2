@@ -71,7 +71,7 @@ def detect():
         ), status.HTTP_400_BAD_REQUEST
     # Step 4 : Lấy thông tin bệnh
     try:
-        Id_B = ModelBenh.query.filter_by(Id_M=Id_M-1, STT=STT).first().Id_B
+        Id_B = ModelBenh.query.filter_by(Id_M=Id_M, STT=STT).first().Id_B
         B = Benh.query.filter_by(Id_B=Id_B).first()
     except:
         return jsonify(
@@ -248,7 +248,8 @@ def insertModel():
         Models.save(f"./server/models/{request.values['Ten_M']}.pickle")
         # Step 4 : Tạo model mới
         oldModel = Model.query.filter_by(TrangThai=True).first()
-        oldModel.TrangThai = False
+        if(oldModel):
+            oldModel.TrangThai = False
 
         try:
             db.session.commit()
